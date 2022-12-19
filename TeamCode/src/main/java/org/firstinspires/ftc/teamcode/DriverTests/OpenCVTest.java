@@ -18,7 +18,7 @@ public class OpenCVTest extends _Autonomous {
     @Override
     public void init() {
         Robot.setup(hardwareMap, telemetry);
-        _webcam = new _OpenCV("Webcam 1", 320, 240);
+        _webcam = new _OpenCV("Webcam 2", 320, 240);
         _justEntered = true;
         _state = States.VIEWPORT_ON;
     }
