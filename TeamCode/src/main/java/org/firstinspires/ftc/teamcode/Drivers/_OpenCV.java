@@ -15,21 +15,15 @@ public class _OpenCV {
 
     private final OpenCvWebcam _webcam;
 
-    public _OpenCV(String name, int width, int height, OpenCvCameraRotation rotation) {
+    public _OpenCV(String name, int width, int height, OpenCvPipeline pipeline, OpenCvCameraRotation rotation) {
         _NAME = name;
         int cameraMonitorViewId = Robot.hardwareMap.appContext.getResources().getIdentifier(
                 "cameraMonitorViewId", "id", Robot.hardwareMap.appContext.getPackageName());
         _webcam = OpenCvCameraFactory.getInstance().createWebcam(Robot.hardwareMap.get(WebcamName.class, _NAME), cameraMonitorViewId);
-        _webcam.setPipeline(new OpenCvPipeline() {
-            @Override
-            public Mat processFrame(Mat input) {
-                return input;
-            }
-        });
+        _webcam.setPipeline(pipeline);
         _webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                _webcam.setViewportRenderer(OpenCvCamera.ViewportRenderer.GPU_ACCELERATED);
                 _webcam.startStreaming(width, height, rotation);
             }
 
@@ -41,8 +35,8 @@ public class _OpenCV {
         });
     }
 
-    public _OpenCV(String name, int width, int height) {
-        this(name, width, height, OpenCvCameraRotation.UPRIGHT);
+    public _OpenCV(String name, int width, int height, OpenCvPipeline pipeline) {
+        this(name, width, height, pipeline, OpenCvCameraRotation.UPRIGHT);
     }
 
     public void pauseLiveView() {
@@ -55,6 +49,14 @@ public class _OpenCV {
         /* OUT OF ORDER */
         // Useless since viewport isn't being paused
         _webcam.resumeViewport();
+    }
+
+    public void stopStreaming() {
+        _webcam.stopStreaming();
+    }
+
+    public void closeCameraDevice() {
+        _webcam.closeCameraDevice();
     }
 
     public String getName() {
