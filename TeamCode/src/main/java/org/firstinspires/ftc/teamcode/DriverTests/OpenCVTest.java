@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.Control.Robot;
 import org.firstinspires.ftc.teamcode.Control._Autonomous;
 import org.firstinspires.ftc.teamcode.Drivers._OpenCV;
+import org.opencv.core.Mat;
+import org.openftc.easyopencv.OpenCvPipeline;
 
 @Autonomous(name="OpenCVTest", group="DriverTest")
 public class OpenCVTest extends _Autonomous {
@@ -18,7 +20,14 @@ public class OpenCVTest extends _Autonomous {
     @Override
     public void init() {
         Robot.setup(hardwareMap, telemetry);
-        _webcam = new _OpenCV("Webcam 2", 320, 240);
+
+        _webcam = new _OpenCV("Webcam 1", 320, 240, new OpenCvPipeline() {
+            @Override
+            public Mat processFrame(Mat input) {
+                return input;
+            }
+        });
+
         _justEntered = true;
         _state = States.VIEWPORT_ON;
     }
