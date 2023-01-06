@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.Control.Robot;
 import org.firstinspires.ftc.teamcode.Control._Autonomous;
 
-@Autonomous(name="LinearslideTest", group="DriverTest")
+@Autonomous(name="LinearslideTest", group="PeripheralTest")
 public class LinearslideTest extends _Autonomous {
 
     private States _state;
