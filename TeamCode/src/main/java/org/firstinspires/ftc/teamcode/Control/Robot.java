@@ -14,7 +14,15 @@ import org.firstinspires.ftc.teamcode.Drivers._Color;
 
 
 import org.firstinspires.ftc.teamcode.Drivers._Motor;
+import org.firstinspires.ftc.teamcode.Drivers._OpenCV;
 import org.firstinspires.ftc.teamcode.Drivers._Servo;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+import org.openftc.easyopencv.OpenCvPipeline;
 
 public final class Robot {
 
@@ -28,6 +36,8 @@ public final class Robot {
     private static _Motor _linearslide;
     private static _Servo _claw;
     private static _Servo _claw6;
+    private static _OpenCV _webcam;
+    private static _ProcessPipeline _pipeline;
 
     public static final double MM_PER_INCH = 25.4;
     public static final double ANGLE_RANGE = 3;
@@ -88,6 +98,9 @@ public final class Robot {
                 case Color:
                     setupColor();
                     break;
+                case OpenCV:
+                    setupOpenCV();
+                    break;
             }
 
             setupSequence.append(type.name()).append(" ");
@@ -108,13 +121,13 @@ public final class Robot {
     private static void setupAutonomousPart1() {
         setupClaw();
         setupClaw6();
+        setupOpenCV();
     }
 
     private static void setupAutonomousPart2() {
         setupIMU();
         setupDrivetrain();
         setupLinearslide();
-        setupColor();
         //OpenCV is just for testing, not actual runs
     }
 
@@ -149,6 +162,11 @@ public final class Robot {
 
     private static void setupColor() {
         _color = new _Color("color");
+    }
+
+    private static void setupOpenCV() {
+        _pipeline = new _ProcessPipeline();
+        _webcam = new _OpenCV("Webcam 1", 320, 240, _pipeline);
     }
 
     private static void setupLinearslide() {
@@ -244,6 +262,14 @@ public final class Robot {
         return _claw6;
     }
 
+    public static _OpenCV getWebcam() {
+        return _webcam;
+    }
+
+    public static _ProcessPipeline getPipeline() {
+        return _pipeline;
+    }
+
     public static boolean isTurning() {
         return _isTurning;
     }
@@ -258,7 +284,8 @@ public final class Robot {
         Linearslide,
         Claw,
         Claw6,
-        Color
+        Color,
+        OpenCV
     }
 
     public enum FieldSide {
@@ -270,5 +297,46 @@ public final class Robot {
         Front,
         Center,
         Back
+    }
+
+    public static class _ProcessPipeline extends OpenCvPipeline
+    {
+
+        private double _hue;
+        private Mat _processed;
+
+        public _ProcessPipeline() {
+            super();
+            _processed = new Mat();
+        }
+
+        @Override
+        public Mat processFrame(Mat input) {
+            int x = (int) (input.cols() * 0.375);
+            int y = (int) (input.rows() * 0.43);
+            int w = (int) (input.cols() * 0.05);
+            int h = (int) (input.rows() * 0.05);
+
+            Imgproc.cvtColor(input, _processed, Imgproc.COLOR_RGBA2RGB);
+            Imgproc.cvtColor(_processed, _processed, Imgproc.COLOR_RGB2HSV);
+
+            Imgproc.rectangle(
+                    input,
+                    new Point(x, y),
+                    new Point(x + w, y + h),
+                    new Scalar(0, 255, 0), 4
+            );
+
+            _processed = new Mat(_processed, new Rect(x, y, w, h));
+
+            Scalar meanHSV = Core.mean(_processed);
+            _hue = meanHSV.val[0];
+
+            return input;
+        }
+
+        public double getConeHue() {
+            return _hue;
+        }
     }
 }
