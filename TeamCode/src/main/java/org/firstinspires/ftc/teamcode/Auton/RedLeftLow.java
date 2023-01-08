@@ -85,16 +85,16 @@ public class RedLeftLow extends _Autonomous {
                     _justEntered = true;
                 }
                 break;
-            case Turn_Claw:
-                if(_justEntered){
-                    _justEntered=false;
-                    Robot.getClaw6().setPosition(0.3);
-                }
-                else if(!Robot.getClaw6().isBusy()){
-                    _state = RedLeftLow.State.OPEN_CLAW;
-                    _justEntered=true;
-                }
-                break;
+//            case Turn_Claw:
+//                if(_justEntered){
+//                    _justEntered=false;
+//                    Robot.getClaw6().setPosition(0.3);
+//                }
+//                else if(!Robot.getClaw6().isBusy()){
+//                    _state = RedLeftLow.State.OPEN_CLAW;
+//                    _justEntered=true;
+//                }
+//                break;
             case OPEN_CLAW:
                 if(_justEntered){
                     _justEntered=false;

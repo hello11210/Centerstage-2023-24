@@ -14,8 +14,9 @@ public class RedLeft extends _Autonomous {
     private State _state;
     private boolean _justEntered;
     private int _parkingSpot;
-    double hue;
     double t2;
+    private double _hue;
+    private String _color;
 
     @Override
     public void init() {
@@ -24,311 +25,188 @@ public class RedLeft extends _Autonomous {
 
     @Override
     public void init_loop() {
+        telemetry.addLine(Robot.getWebcam().getName());
+        telemetry.addLine("" + Robot.getPipeline().getConeHue());
+
+        _hue = Robot.getPipeline().getConeHue();
     }
 
     @Override
     public void start() {
+        Robot.getWebcam().stopStreaming();
+        Robot.getWebcam().closeCameraDevice();
+
+        if (_hue <= 25) {
+            _color = "Red";
+        }
+        else if (_hue <= 75) {
+            _color = "Green";
+        }
+        else {
+            _color = "Blue";
+        }
+
         Robot.setup(hardwareMap, telemetry, Robot.SetupType.AutonomousPart2);
 
-        _state = State.Move_Forward;
+        _state = State.moveleftlil;
         _justEntered = true;
     }
 
     @Override
     public void loop() {
-        Robot.update();
-        Robot.getColor().fetchData();
-        telemetry.addLine("Hue: " + String.valueOf(Robot.getColor().getHue()));
-        hue = Robot.getColor().getHue();
-        telemetry.addLine("Parking: " + String.valueOf(_parkingSpot));
-
+        telemetry.addLine(_color);
 
         switch (_state) {
-            case Move_Forward:
+            case moveleftlil:
                 if(_justEntered){
                     _justEntered=false;
-                    Robot.getDrivetrain().runDistance(0.2, 23, _Drivetrain.Movements.forward);
+                    Robot.getDrivetrain().runDistance(0.2, 3, _Drivetrain.Movements.left);
                 }
                 else if(!Robot.getDrivetrain().isBusy()){
-                    _state = State.Sense;
+                    _state = State.forward;
                     _justEntered=true;
                 }
                 break;
 
 
-            case Sense:
-                if (_justEntered) {
-                    _justEntered = false;
-                    if (hue < 10 || hue > 350) {//red
-                        _parkingSpot = 1;
-
-
-                    } else if (hue > 110 && hue < 140) {//green
-                        _parkingSpot = 2;
-
-
-                    } else if (hue < 255 && hue > 195) {//blue
-                        _parkingSpot = 3;
-
-                    } else {
-                        _parkingSpot = 4;
-                    }
-
-
-                }
-                else if(!Robot.getDrivetrain().isBusy()){
-                    _state = State.back;
-                    _justEntered=true;
-                }
-                break;
-           case back:
-                if (_justEntered) {
-                    _justEntered = false;
-                    Robot.getDrivetrain().runDistance(0.25, 20, _Drivetrain.Movements.backward);
-                }
-                else if (!Robot.getDrivetrain().isBusy()) {
-                    _state = State.wait6;
-                    _justEntered = true;
-                }
-                break;
-
-            case wait6:
+            case forward:
                 if(_justEntered){
                     _justEntered=false;
-                    t2 = Robot.runtime.milliseconds();
-
+                    Robot.getDrivetrain().runDistance(0.2, 24, _Drivetrain.Movements.forward);
                 }
-                else if(Robot.runtime.milliseconds() - t2 > 250){
-                    _state = State.Moveright;
+                else if(!Robot.getDrivetrain().isBusy()){
+                    _state = State.turnaxis;
                     _justEntered=true;
                 }
                 break;
-
-            case Moveright:
+            case turnaxis:
                 if (_justEntered){
                     _justEntered=false;
-                    Robot.getDrivetrain().runDistance(0.2, 28, _Drivetrain.Movements.right);
+                    Robot.getDrivetrain().runSpeedAngle(90,0);
                 }
-                else if (!Robot.getDrivetrain().isBusy()){
-                    _state=State.FORWARD_TO_LOW_POLE;
-                    _justEntered=true;
+                else if(!Robot.getDrivetrain().isBusy()){
+                    _state = State.forward1;
+                    _justEntered = true;
                 }
-
-            case FORWARD_TO_LOW_POLE:
+                break;
+            case forward1:
                 if (_justEntered) {
                     _justEntered = false;
-                    Robot.getDrivetrain().runDistance(0.3, 30, _Drivetrain.Movements.forward);
+                    Robot.getDrivetrain().runDistance(0.2, 20, _Drivetrain.Movements.forward);
                 }
                 else if (!Robot.getDrivetrain().isBusy()) {
-                    _state = State.Turnaxis;
+                    _state = State.liftlinearslide;
                     _justEntered = true;
                 }
                 break;
-            case Turnaxis:
-                if(_justEntered){
-                    _justEntered=false;
-                    Robot.getDrivetrain().runDistance(0.3, 5.2, _Drivetrain.Movements.cw);
-                }
-                else if (!Robot.getDrivetrain().isBusy()){
-                    _state=State.RaiseSlide;
-                    _justEntered=true;
-                }
-                break;
-            case RaiseSlide:
+            case liftlinearslide:
                 if (_justEntered) {
                     _justEntered = false;
-                    Robot.getLinearslide().runDistance(0.5, 23 );
-                    Robot.getDrivetrain().runDistance(0.3, 0.5, _Drivetrain.Movements.forward);
+                    Robot.getLinearslide().runDistance(0.5, 7 );
                 }
                 else if (!Robot.getLinearslide().isBusy()) {
-                    _state = State.Turn_Claw;
+                    _state = State.angleclaw;
                     _justEntered = true;
                 }
                 break;
-            case Turn_Claw:
+            case angleclaw:
                 if(_justEntered){
                     _justEntered=false;
-                    Robot.getClaw6().setPosition(0.3);
+                    Robot.getClawPivot().setPosition(0.9);
                 }
-                else if(!Robot.getClaw6().isBusy()){
-                    _state = State.wait2;
+                else if(!Robot.getClawPivot().isBusy()){
+                    _state = State.openclaw;
                     _justEntered=true;
                 }
                 break;
 
-            case wait2:
-                if(_justEntered){
-                    _justEntered=false;
-                    t2 = Robot.runtime.milliseconds();
-                }
-                else if(Robot.runtime.milliseconds() - t2 > 500){
-                    _state = State.OPEN_CLAW;
-                    _justEntered=true;
-                }
-                break;
-
-            case OPEN_CLAW:
+            case openclaw:
                 if(_justEntered){
                     _justEntered=false;
                     Robot.getClaw().setPosition(0.55);
                 }
                 else if(!Robot.getClaw().isBusy()){
-                    _state = State.wait3;
+                    _state = State.closeclaw;
                     _justEntered=true;
                 }
                 break;
 
-            case wait3:
+            case closeclaw:
                 if(_justEntered){
                     _justEntered=false;
-                    t2 = Robot.runtime.milliseconds();
-                }
-                else if(Robot.runtime.milliseconds() - t2 > 500){
-                    _state = State.clawup;
-                    _justEntered=true;
-                }
-                break;
-
-            case clawup:
-                if(_justEntered){
-                    _justEntered=false;
-                    Robot.getClaw6().setPosition(0);
-                }
-                else if(!Robot.getClaw6().isBusy()){
-                    _state=State.wait4;
-                    _justEntered=true;
-                }
-                break;
-            case wait4:
-                if(_justEntered){
-                    _justEntered=false;
-                    t2 = Robot.runtime.milliseconds();
-                }
-                else if(Robot.runtime.milliseconds() - t2 > 500){
-                    _state = State.CLOSE_CLAW;
-                    _justEntered=true;
-                }
-                break;
-
-            case CLOSE_CLAW:
-                if(_justEntered){
-                    _justEntered=false;
-                    Robot.getClaw().setPosition(0.8);
+                    Robot.getClaw().setPosition(0);
                 }
                 else if(!Robot.getClaw().isBusy()){
-                    _state=State.wait5;
+                    _state = State.anglebackclaw;
+                    _justEntered=true;
+                }
+                break;
+            case anglebackclaw:
+                if(_justEntered){
+                    _justEntered=false;
+                    Robot.getClawPivot().setPosition(0.1);
+                }
+                else if(!Robot.getClawPivot().isBusy()){
+                    _state = State.linslidedown;
                     _justEntered=true;
                 }
                 break;
 
-            case wait5:
-                if(_justEntered){
-                    _justEntered=false;
-                    t2 = Robot.runtime.milliseconds();
-                }
-                else if(Robot.runtime.milliseconds() - t2 > 500){
-                    _state = State.slidedown;
-                    _justEntered=true;
-                }
-                break;
 
-            case slidedown:
+            case linslidedown:
                 if(_justEntered){
                     _justEntered=false;
-                    Robot.getLinearslide().runDistance(-0.5, 23 );
+                    Robot.getLinearslide().runDistance(-0.5, 7 );
                 }
                 else if (!Robot.getLinearslide().isBusy()){
-                    _state=State.turnback;
-                    _justEntered=true;
-                }
-                break;
-            case turnback:
-                if(_justEntered){
-                    _justEntered=false;
-                    Robot.getDrivetrain().runDistance(0.3, 5.3, _Drivetrain.Movements.ccw);
-                }
-                else if (!Robot.getDrivetrain().isBusy()){
-                    _state=State.moveback1;
-                    _justEntered=true;
-                }
-                break;
-            case moveback1:
-                if(_justEntered){
-                    _justEntered=false;
-                    Robot.getDrivetrain().runDistance(0.3, 2.2, _Drivetrain.Movements.backward);
-                }
-                else if (!Robot.getDrivetrain().isBusy()){
-                    _state=State.moveleft;
+                    _state=State.movebacklil;
                     _justEntered=true;
                 }
                 break;
 
-            case moveleft:
+            case movebacklil:
                 if(_justEntered){
                     _justEntered=false;
-                    Robot.getDrivetrain().runDistance(0.3, 55, _Drivetrain.Movements.left);
-                }
-                else if(!Robot.getDrivetrain().isBusy()){
-                    _state=State.Turnaxis3;
-                    _justEntered=true;
-                }
-                break;
-
-            case Turnaxis3:
-                if(_justEntered){
-                    _justEntered=false;
-                    Robot.getDrivetrain().runDistance(0.3, 1, _Drivetrain.Movements.ccw);
+                    Robot.getDrivetrain().runDistance(0.3, 3, _Drivetrain.Movements.backward);
                 }
                 else if (!Robot.getDrivetrain().isBusy()){
-                    _state=State.move_forward1;
+                    _state=State.utilizeopencv;
                     _justEntered=true;
                 }
                 break;
 
-            case move_forward1:
+
+            case utilizeopencv:
                 if (_justEntered) {
                     _justEntered = false;
-                    if (_parkingSpot == 2) {
-                        Robot.getDrivetrain().runDistance(.3, 25, _Drivetrain.Movements.right);
-                    } else if (_parkingSpot == 3) {
+                    if (_color.equals("Red")) {
+                        Robot.getDrivetrain().runDistance(.3, 50, _Drivetrain.Movements.left);
+                    } else if (_color.equals("Green")) {
 
-                        Robot.getDrivetrain().runDistance(.55, 50, _Drivetrain.Movements.right);
+                        Robot.getDrivetrain().runDistance(.55, 25, _Drivetrain.Movements.left);
                     } else {
+                        Robot.getDrivetrain().runDistance(.55, 8, _Drivetrain.Movements.left);
                     }
                 }
-                else if (!Robot.getDrivetrain().isBusy()) {
-                    _state = State.Turn_Right;
-                    _justEntered = true;
-                }
+
                 break;
         }
     }
 
     private enum State {
-        Moveright,
-        FORWARD_TO_LOW_POLE,
-        Turnaxis,
-        RaiseSlide,
-        CLOSE_CLAW,
-        Turn_Claw,
-        OPEN_CLAW,
-        Turnaxis3,
-        clawup,
-        wait6,
-        wait3,
-        slidedown,
-        wait4,
-        turnback,
-        moveback1,
-        moveleft,
-        wait5,
-        Move_Forward,
-        wait,
-        wait2,
-        Sense,
-        back,
-        FORWARD,
-        move_forward1,
-        Turn_Right,
+        //opencv,
+        moveleftlil,
+        forward,
+        turnaxis,
+        forward1,
+        liftlinearslide,
+        angleclaw,
+        openclaw,
+        closeclaw,
+        anglebackclaw,
+        linslidedown,
+        movebacklil,
+        utilizeopencv
+
     }
 }

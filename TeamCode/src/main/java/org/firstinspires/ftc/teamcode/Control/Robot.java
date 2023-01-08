@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.Drivers._Color;
 import org.firstinspires.ftc.teamcode.Drivers._Motor;
 import org.firstinspires.ftc.teamcode.Drivers._OpenCV;
 import org.firstinspires.ftc.teamcode.Drivers._Servo;
+import org.firstinspires.ftc.teamcode.Drivers._ServoGroup;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -35,7 +36,8 @@ public final class Robot {
     private static _Color _color;
     private static _Motor _linearslide;
     private static _Servo _claw;
-    private static _Servo _claw6;
+    private static _ServoGroup _ClawPivot;
+    private static _ServoGroup _Arm;
     private static _OpenCV _webcam;
     private static _ProcessPipeline _pipeline;
 
@@ -92,14 +94,17 @@ public final class Robot {
                 case Claw:
                     setupClaw();
                     break;
-                case Claw6:
-                    setupClaw6();
+                case ClawPivot:
+                    setupClawPivot();
                     break;
                 case Color:
                     setupColor();
                     break;
                 case OpenCV:
                     setupOpenCV();
+                    break;
+                case Arm:
+                    setupArm();
                     break;
             }
 
@@ -120,8 +125,9 @@ public final class Robot {
 
     private static void setupAutonomousPart1() {
         setupClaw();
-        setupClaw6();
+        setupClawPivot();
         setupOpenCV();
+        setupArm();
     }
 
     private static void setupAutonomousPart2() {
@@ -133,8 +139,9 @@ public final class Robot {
 
     private static void setupTeleOp1() {
         setupClaw();
-        setupClaw6();
+        setupClawPivot();
         setupLinearslide();
+        setupArm();
     }
 
     private static void setupTeleOp2() {
@@ -171,18 +178,27 @@ public final class Robot {
 
     private static void setupLinearslide() {
         double linearslideDiameter = 1.25/2; //inches
-        _linearslide = new _Motor("linearslide", _Motor.Type.GOBILDA_435_RPM, DcMotorSimple.Direction.REVERSE,
+        _linearslide = new _Motor("linearslide", _Motor.Type.GOBILDA_435_RPM, DcMotorSimple.Direction.FORWARD,
                 DcMotor.ZeroPowerBehavior.BRAKE, linearslideDiameter, true); //Add encoder if theres isn't already
     }
 
     private static void setupClaw() {
         double startPosition = 1;
-        _claw = new _Servo("claw", Servo.Direction.REVERSE, 0, 1, startPosition);
+        _claw = new _Servo("claw", Servo.Direction.REVERSE, 0, 1, 0.885);
 
     }
-    private static void setupClaw6() {
+    private static void setupClawPivot() {
         double startPosition = 0;
-        _claw6 = new _Servo("claw6", Servo.Direction.FORWARD, 0, 1, startPosition);
+        _Servo ClawPivotleft = new _Servo("pivotRight", Servo.Direction.FORWARD, 0, 1, 1);
+        _Servo ClawPivotright = new _Servo("pivotLeft", Servo.Direction.REVERSE, 0, 1, 1);
+        _ClawPivot  = new _ServoGroup(ClawPivotleft, ClawPivotright);
+        //pivot left sgould be in control hub
+    }
+    private static void setupArm(){
+        double startPosition = 0;
+        _Servo ArmLeft = new _Servo("armLeft", Servo.Direction.REVERSE, 0, 1,0.01);
+        _Servo ArmRight = new _Servo("armRight", Servo.Direction.FORWARD, 0, 1, 0.01);
+        _Arm  = new _ServoGroup(ArmLeft, ArmRight);
     }
 
     public static void update() {
@@ -193,7 +209,8 @@ public final class Robot {
         telemetry.addLine("Update3");
         _linearslide.update();
         _claw.update();
-        _claw6.update();
+        _ClawPivot.update();
+        _Arm.update();
 
         if (_isTurning) {
             if (Math.abs(_turnDegrees) > Math.max(_TURN_OFFSET_POSITIVE, _TURN_OFFSET_NEGATIVE)) {
@@ -258,8 +275,11 @@ public final class Robot {
         return _claw;
     }
 
-    public static _Servo getClaw6() {
-        return _claw6;
+    public static _ServoGroup getClawPivot() {
+        return _ClawPivot;
+    }
+    public static _ServoGroup getArm(){
+        return _Arm;
     }
 
     public static _OpenCV getWebcam() {
@@ -283,9 +303,10 @@ public final class Robot {
         IMU,
         Linearslide,
         Claw,
-        Claw6,
+        ClawPivot,
         Color,
-        OpenCV
+        OpenCV,
+        Arm
     }
 
     public enum FieldSide {

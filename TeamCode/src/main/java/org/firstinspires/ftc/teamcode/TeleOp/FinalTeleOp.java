@@ -9,9 +9,9 @@ import org.firstinspires.ftc.teamcode.Drivers._Drivetrain;
 @TeleOp(group="FinalTeleOp")
 public class FinalTeleOp extends _TeleOp {
 
-    private final int _LOW_POLE = 6;
-    private final int _MID_POLE = 14;
-    private final int _HIGH_POLE = 24;
+    private final double _LOW_POLE = 0.25;
+    private final double _MID_POLE = 0.6;
+    private final double _HIGH_POLE = 0.5;
 
     private boolean _triggerPressed = false;
     private int _height = 0;
@@ -51,8 +51,7 @@ public class FinalTeleOp extends _TeleOp {
         }
         else if (gamepad1.right_stick_button) {
             Robot.getDrivetrain().runSpeed(0.5, _Drivetrain.Movements.cw);
-        }
-        else {
+        } else {
             Robot.getDrivetrain().stop();
         }
 
@@ -73,41 +72,56 @@ public class FinalTeleOp extends _TeleOp {
         }
         else {
             if (gamepad2.dpad_left) {
-                Robot.getLinearslide().runDistance(0.5, _LOW_POLE);
-                _height = _LOW_POLE;
+                Robot.getArm().setPosition(_LOW_POLE);
+                Robot.getClawPivot().setPosition(.3);
+
             }
             else if (gamepad2.dpad_up){
-                Robot.getLinearslide().runDistance(0.5, _MID_POLE);
-                _height = _MID_POLE;
+                Robot.getArm().setPosition(_MID_POLE);
+                Robot.getClawPivot().setPosition(0.1);
+
             }
             else if (gamepad2.dpad_right){
-                Robot.getLinearslide().runDistance(0.5, _HIGH_POLE);
-                _height = _HIGH_POLE;
+                Robot.getLinearslide().runDistance(0.5, 9);
+                Robot.getArm().setPosition(_HIGH_POLE);
+                Robot.getClawPivot().setPosition(0.2);
+                _height = 9;
             }
             else if (gamepad2.dpad_down){
-                Robot.getLinearslide().runDistance(0.5, -_height);
+                Robot.getArm().setPosition(0.06);
+                Robot.getLinearslide().runDistance(-0.5, _height);
+                Robot.getClawPivot().setPosition(0.52);
+
                 _height = 0;
             }
         }
 
-        if (gamepad2.y){
-            //assume that 0 is up position
-            Robot.getClaw6().setSlowPosition(0, 5);
+        if (gamepad1.b){
+            Robot.getClaw().setPosition(0.725);
         }
-        else if (gamepad2.a){
-            // assume that 1 is down position
-            Robot.getClaw6().setSlowPosition(0.3, 5);
+        else if (gamepad1.a){
+            Robot.getClaw().setPosition(0.885);
+
         }
         else {
-            Robot.getClaw6().resetForNextRun();
+            Robot.getClawPivot().resetForNextRun();
         }
-        if (gamepad1.b){
+//        if (gamepad2.b){
+//            Robot.getArm().setPosition(0.1);
+//        }
+//        else if (gamepad2.x){
+//            Robot.getArm().setPosition(0.9);
+//        }
+//        else{
+//            Robot.getArm().resetForNextRun();
+//        }
+        if (gamepad1.a){
             //assume 0 is open
-            Robot.getClaw().setPosition(0.55);
+            Robot.getClaw().setPosition(0.725);
         }
-        else if (gamepad1.x){
+        else if (gamepad1.y){
             //assume 1 is close
-            Robot.getClaw().setPosition(0.8);
+            Robot.getClaw().setPosition(0.885);
         }
         else{
             Robot.getClaw().resetForNextRun();
