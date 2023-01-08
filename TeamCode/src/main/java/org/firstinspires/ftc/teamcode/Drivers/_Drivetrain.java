@@ -124,6 +124,22 @@ public class _Drivetrain {
         return _speed;
     }
 
+    public double getSpeedFR() {
+        return _drivetrain[0].getSpeed();
+    }
+
+    public double getSpeedFL() {
+        return _drivetrain[1].getSpeed();
+    }
+
+    public double getSpeedBR() {
+        return _drivetrain[2].getSpeed();
+    }
+
+    public double getSpeedBL() {
+        return _drivetrain[3].getSpeed();
+    }
+
     public boolean isBusy() {
         return _isBusy;
     }

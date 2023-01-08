@@ -41,10 +41,10 @@ public class DrivetrainTest extends _Autonomous {
     @Override
     public void loop() {
         _drivetrain.update();
-        telemetry.addLine(String.valueOf(_drivetrain.getMotorNum()));
-        telemetry.addLine(String.valueOf(_drivetrain.getSpeed()));
-        telemetry.addLine(String.valueOf(_drivetrain.isBusy()));
-        telemetry.addLine(_state.name());
+        telemetry.addLine("FR Speed: " + _drivetrain.getSpeedFR());
+        telemetry.addLine("FL Speed: " + _drivetrain.getSpeedFL());
+        telemetry.addLine("BR Speed: " + _drivetrain.getSpeedBR());
+        telemetry.addLine("BL Speed: " + _drivetrain.getSpeedBL());
 
         switch (_state) {
             case RUN_DIST:
