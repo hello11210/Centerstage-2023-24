@@ -33,7 +33,7 @@ public class DrivetrainTest extends _Autonomous {
         _Motor bl = new _Motor("motorBL", _Motor.Type.GOBILDA_312_RPM, DcMotorSimple.Direction.FORWARD,
                 DcMotor.ZeroPowerBehavior.BRAKE, wheelDiameter, true);
         _drivetrain = new _Drivetrain(fr, fl, br, bl, 1.0);
-        _drivetrain.setTypicalSpeed(0.1);
+        _drivetrain.setTypicalSpeed(0.5);
         _state = States.RUN_DIST;
         _justEntered = true;
     }
@@ -60,7 +60,7 @@ public class DrivetrainTest extends _Autonomous {
             case RUN_TIME:
                 if (_justEntered) {
                     _justEntered = false;
-                    _drivetrain.runTime(0.1, 1000, _Drivetrain.Movements.forward);
+                    _drivetrain.runTime(0.25, 1000, _Drivetrain.Movements.forward);
                 }
                 else if (!_drivetrain.isBusy()) {
                     _state = States.RUN_INTERRUPTED;
@@ -83,7 +83,7 @@ public class DrivetrainTest extends _Autonomous {
             case RUN_45_INTERRUPTED:
                 if (_justEntered) {
                     _justEntered = false;
-                    _drivetrain.runSpeedAngle(0.1, 45, 0);
+                    _drivetrain.runSpeedAngle(0.25, 45, 0);
                     _startTime = Robot.runtime.milliseconds();
                     _elapsedTime = 3000;
                 }
