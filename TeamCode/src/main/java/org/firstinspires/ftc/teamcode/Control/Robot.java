@@ -202,11 +202,8 @@ public final class Robot {
     }
 
     public static void update() {
-        telemetry.addLine("Update1");
         _imu.update();
-        telemetry.addLine("Update2");
         _drivetrain.update();
-        telemetry.addLine("Update3");
         _linearslide.update();
         _claw.update();
         _ClawPivot.update();
@@ -228,7 +225,6 @@ public final class Robot {
                 _drivetrain.stop();
             }
         }
-        telemetry.addLine("Update12");
     }
 
     public static void turn(double speed, double degrees, TurnAxis turnAxis) {
