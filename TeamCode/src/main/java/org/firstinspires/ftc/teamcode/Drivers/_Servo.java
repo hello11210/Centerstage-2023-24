@@ -138,7 +138,6 @@ public class _Servo {
     }
 
     private void _setPosition(double position) {
-        Robot.telemetry.addLine("Just set position");
         _position = _clampPosition(position);
         _servo.setPosition(_position + _MIN);
     }
