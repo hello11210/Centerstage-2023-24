@@ -17,6 +17,8 @@ import org.firstinspires.ftc.teamcode.Drivers._Motor;
 import org.firstinspires.ftc.teamcode.Drivers._OpenCV;
 import org.firstinspires.ftc.teamcode.Drivers._Servo;
 import org.firstinspires.ftc.teamcode.Drivers._ServoGroup;
+import org.firstinspires.ftc.teamcode.Drivers._TFOD;
+import org.firstinspires.ftc.teamcode.Drivers._Vuforia;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -40,18 +42,14 @@ public final class Robot {
     private static _ServoGroup _Arm;
     private static _OpenCV _webcam;
     private static _ProcessPipeline _pipeline;
+    private static _Vuforia _vuforia;
+    private static _TFOD _tfod;
 
     public static final double MM_PER_INCH = 25.4;
-    public static final double ANGLE_RANGE = 3;
 
-    private static final double _TURN_OFFSET_POSITIVE = 18;
-    private static final double _TURN_OFFSET_NEGATIVE = 15;
+    private static final double _TURN_OFFSET_POSITIVE = 0;
+    private static final double _TURN_OFFSET_NEGATIVE = 0;
 
-    private static final double _LEVEL1 = 1135;
-    private static final double _LEVEL2 = 2999;
-    private static final double _Level3 = 4701;
-
-    private static FieldSide _fieldSide;
     private static boolean _isTurning = false;
     private static double _startAngle;
     private static double _turnDegrees;
@@ -106,6 +104,12 @@ public final class Robot {
                 case Arm:
                     setupArm();
                     break;
+                case Vuforia:
+                    setupVuforia();
+                    break;
+                case TFOD:
+                    setupTFOD();
+                    break;
             }
 
             setupSequence.append(type.name()).append(" ");
@@ -114,20 +118,12 @@ public final class Robot {
         telemetry.addLine(setupSequence.toString());
     }
 
-    public static void setFieldSide(FieldSide fieldSide) {
-        _fieldSide = fieldSide;
-
-        if (_fieldSide == FieldSide.BLUE) {
-        }
-        else if (_fieldSide == FieldSide.RED) {
-        }
-    }
-
     private static void setupAutonomousPart1() {
         setupClaw();
         setupClawPivot();
-        setupOpenCV();
         setupArm();
+        setupVuforia();
+        setupTFOD();
     }
 
     private static void setupAutonomousPart2() {
@@ -140,13 +136,13 @@ public final class Robot {
     private static void setupTeleOp1() {
         setupClaw();
         setupClawPivot();
-        setupLinearslide();
         setupArm();
     }
 
     private static void setupTeleOp2() {
         setupIMU();
         setupDrivetrain();
+        setupLinearslide();
         //OpenCV is just for testing, not actual runs
     }
 
@@ -164,7 +160,7 @@ public final class Robot {
     }
 
     private static void setupIMU() {
-        _imu = new _IMU("imu", false, true);
+        _imu = new _IMU("imu", true, true);
     }
 
     private static void setupColor() {
@@ -201,6 +197,15 @@ public final class Robot {
         _Arm  = new _ServoGroup(ArmLeft, ArmRight);
     }
 
+    private static void setupVuforia() {
+        _vuforia = new _Vuforia("Webcam 1");
+    }
+
+    private static void setupTFOD() {
+        _tfod = new _TFOD(_vuforia.getVuforia(), 0.45f, true, 320, 1.0, 16.0/9.0,
+                "AGS1273.tflite", new String[] {"robot", "gear", "android"});
+    }
+
     public static void update() {
         _imu.update();
         _drivetrain.update();
@@ -231,19 +236,22 @@ public final class Robot {
         if (!_isTurning && degrees != 0) {
             _isTurning = true;
             _startAngle = _imu.getYaw();
-            degrees = _turnDegrees;
+            _turnDegrees = degrees;
 
+            _Drivetrain.Movements movement = _Drivetrain.Movements.forward; // arbitrary initialization
             switch (turnAxis) {
                 case Center:
-                    _drivetrain.runSpeed(speed, degrees > 0 ? _Drivetrain.Movements.cw : _Drivetrain.Movements.ccw);
+                    movement = _turnDegrees > 0 ? _Drivetrain.Movements.ccw : _Drivetrain.Movements.cw;
                     break;
                 case Back:
-                    _drivetrain.runSpeed(speed, degrees > 0 ? _Drivetrain.Movements.cwback : _Drivetrain.Movements.ccwback);
+                    movement = _turnDegrees > 0 ? _Drivetrain.Movements.ccwback : _Drivetrain.Movements.cwback;
                     break;
                 case Front:
-                    _drivetrain.runSpeed(speed, degrees > 0 ? _Drivetrain.Movements.cwfront : _Drivetrain.Movements.ccwfront);
+                    movement = _turnDegrees > 0 ? _Drivetrain.Movements.ccwfront : _Drivetrain.Movements.cwfront;
                     break;
             }
+
+            _drivetrain.runSpeed(speed, movement);
         }
     }
 
@@ -286,6 +294,14 @@ public final class Robot {
         return _pipeline;
     }
 
+    public static _Vuforia getVuforia() {
+        return _vuforia;
+    }
+
+    public static _TFOD getTFOD() {
+        return _tfod;
+    }
+
     public static boolean isTurning() {
         return _isTurning;
     }
@@ -302,12 +318,9 @@ public final class Robot {
         ClawPivot,
         Color,
         OpenCV,
-        Arm
-    }
-
-    public enum FieldSide {
-        BLUE,
-        RED
+        Arm,
+        Vuforia,
+        TFOD
     }
 
     public enum TurnAxis {
