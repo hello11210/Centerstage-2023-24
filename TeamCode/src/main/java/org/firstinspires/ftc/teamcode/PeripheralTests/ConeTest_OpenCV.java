@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.Control.Robot;
 import org.firstinspires.ftc.teamcode.Control._Autonomous;
 
-@Autonomous(name="ConeTest", group="PeripheralTest")
-public class ConeTest extends _Autonomous {
+@Autonomous(name="ConeTest_OpenCV", group="PeripheralTest")
+public class ConeTest_OpenCV extends _Autonomous {
 
     private double _hue;
     private String _color;
