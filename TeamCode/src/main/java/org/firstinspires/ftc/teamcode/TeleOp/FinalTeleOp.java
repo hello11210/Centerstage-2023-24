@@ -126,6 +126,15 @@ public class FinalTeleOp extends _TeleOp {
         else{
             Robot.getClaw().resetForNextRun();
         }
+        if (gamepad2.a){
+            Robot.getClawPivot().setPosition(0.55);
+        }
+        else if (gamepad2.y){
+            Robot.getClawPivot().setPosition(0.65);
+        }
+        else {
+            Robot.getClawPivot().resetForNextRun();
+        }
 
     }
 }

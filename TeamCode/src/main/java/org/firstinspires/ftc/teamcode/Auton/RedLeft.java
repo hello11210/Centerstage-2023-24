@@ -65,7 +65,7 @@ public class RedLeft extends _Autonomous {
         switch (_state) {
             case right:
                 if (_justEntered) {
-                    Robot.getDrivetrain().runDistance(0.5, 20, _Drivetrain.Movements.right);
+                    Robot.getDrivetrain().runDistance(0.5, 20, _Drivetrain.Movements.forward);
                     _justEntered = false;
                 }
                 else if (!Robot.getDrivetrain().isBusy()) {
@@ -75,7 +75,15 @@ public class RedLeft extends _Autonomous {
                 break;
             case forward:
                 if (_justEntered) {
-                    Robot.getDrivetrain().runDistance(0.5, 17, _Drivetrain.Movements.forward);
+                    if (coneNum==1){
+                        Robot.getDrivetrain().runDistance(0.5, 20, _Drivetrain.Movements.left);
+                    }
+                    else if (coneNum==3){
+                        Robot.getDrivetrain().runDistance(0.5, 20, _Drivetrain.Movements.right);
+                    }
+                    else{
+                        Robot.getDrivetrain().runDistance(0.5, 1, _Drivetrain.Movements.forward);
+                    }
                     _justEntered = false;
                 }
                 else if (!Robot.getDrivetrain().isBusy()) {
@@ -83,58 +91,58 @@ public class RedLeft extends _Autonomous {
                     _state = State.tilt;
                 }
                 break;
-            case tilt:
-                if (_justEntered) {
-                    Robot.turn(0.25, -25);
-                    _justEntered = false;
-                }
-                else if (!Robot.isTurning()) {
-                    _justEntered = true;
-                    _state = State.tilt_back;
-                }
-                break;
-            case tilt_back:
-                if (_justEntered) {
-                    Robot.turn(0.25, 20);
-                    _justEntered = false;
-                }
-                else if (!Robot.isTurning()) {
-                    _justEntered = true;
-                    _state = State.forward_row3;
-                }
-                break;
-            case forward_row3:
-                if (_justEntered) {
-                    Robot.getDrivetrain().runDistance(0.5, 15, _Drivetrain.Movements.forward);
-                    _justEntered = false;
-                }
-                else if (!Robot.getDrivetrain().isBusy()) {
-                    _justEntered = true;
-                    _state = State.turn_left;
-                }
-                break;
-            case turn_left:
-                if (_justEntered) {
-                    Robot.turn(0.25, 80);
-                    _justEntered = false;
-                }
-                else if (!Robot.isTurning()) {
-                    _justEntered = true;
-                    _state = State.forward_col1;
-                }
-                break;
-            case forward_col1:
-                if (_justEntered) {
-                    Robot.getDrivetrain().runDistance(0.5, 30, _Drivetrain.Movements.forward);
-                    _justEntered = false;
-                }
-                else if (!Robot.getDrivetrain().isBusy()) {
-                    _justEntered = true;
-                    _state = State.stop;
-                }
-                break;
-            case stop:
-                break;
+//            case tilt:
+//                if (_justEntered) {
+//                    Robot.turn(0.25, -25);
+//                    _justEntered = false;
+//                }
+//                else if (!Robot.isTurning()) {
+//                    _justEntered = true;
+//                    _state = State.tilt_back;
+//                }
+//                break;
+//            case tilt_back:
+//                if (_justEntered) {
+//                    Robot.turn(0.25, 20);
+//                    _justEntered = false;
+//                }
+//                else if (!Robot.isTurning()) {
+//                    _justEntered = true;
+//                    _state = State.forward_row3;
+//                }
+//                break;
+//            case forward_row3:
+//                if (_justEntered) {
+//                    Robot.getDrivetrain().runDistance(0.5, 15, _Drivetrain.Movements.forward);
+//                    _justEntered = false;
+//                }
+//                else if (!Robot.getDrivetrain().isBusy()) {
+//                    _justEntered = true;
+//                    _state = State.turn_left;
+//                }
+//                break;
+//            case turn_left:
+//                if (_justEntered) {
+//                    Robot.turn(0.25, 80);
+//                    _justEntered = false;
+//                }
+//                else if (!Robot.isTurning()) {
+//                    _justEntered = true;
+//                    _state = State.forward_col1;
+//                }
+//                break;
+//            case forward_col1:
+//                if (_justEntered) {
+//                    Robot.getDrivetrain().runDistance(0.5, 30, _Drivetrain.Movements.forward);
+//                    _justEntered = false;
+//                }
+//                else if (!Robot.getDrivetrain().isBusy()) {
+//                    _justEntered = true;
+//                    _state = State.stop;
+//                }
+//                break;
+//            case stop:
+//                break;
         }
     }
 

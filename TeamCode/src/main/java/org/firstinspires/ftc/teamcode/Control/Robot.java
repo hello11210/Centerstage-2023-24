@@ -192,8 +192,8 @@ public final class Robot {
     }
     private static void setupArm(){
         double startPosition = 0;
-        _Servo ArmLeft = new _Servo("armLeft", Servo.Direction.REVERSE, 0, 1,0.01);
-        _Servo ArmRight = new _Servo("armRight", Servo.Direction.FORWARD, 0, 1, 0.01);
+        _Servo ArmLeft = new _Servo("armLeft", Servo.Direction.REVERSE, 1, 0,0);
+        _Servo ArmRight = new _Servo("armRight", Servo.Direction.FORWARD, 1, 0, 0.03);
         _Arm  = new _ServoGroup(ArmLeft, ArmRight);
     }
 
