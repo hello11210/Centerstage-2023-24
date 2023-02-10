@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.drive.advanced.PoseStorage;
+//import org.firstinspires.ftc.teamcode.drive.advanced.PoseStorage;
 
 @Autonomous(group = "PeripheralTest")
 public class RoadrunnerTest extends LinearOpMode {
@@ -57,7 +57,7 @@ public class RoadrunnerTest extends LinearOpMode {
 
             drive.update();
 
-            PoseStorage.currentPose = drive.getPoseEstimate();
+//            PoseStorage.currentPose = drive.getPoseEstimate();
         }
     }
 
