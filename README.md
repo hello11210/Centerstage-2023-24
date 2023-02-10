@@ -1,28 +1,16 @@
 ## NOTICE
 
-<<<<<<< HEAD
-This repository contains the public FTC SDK for the Freight Frenzy (2021-2022) competition season.
-=======
 This repository contains the public FTC SDK for the POWERPLAY (2022-2023) competition season.
->>>>>>> 0879b4797f7c9664731c9306926f713ef4ddfe5d
 
 ## Welcome!
 This GitHub repository contains the source code that is used to build an Android app to control a *FIRST* Tech Challenge competition robot.  To use this SDK, download/clone the entire project to your local computer.
 
 ## Getting Started
-<<<<<<< HEAD
-If you are new to robotics or new to the *FIRST* Tech Challenge, then you should consider reviewing the [FTC Blocks Tutorial](https://github.com/FIRST-Tech-Challenge/FtcRobotController/wiki/Blocks-Tutorial) to get familiar with how to use the control system:
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[FTC Blocks Online Tutorial](https://github.com/FIRST-Tech-Challenge/FtcRobotController/wiki/Blocks-Tutorial)
-
-Even if you are an advanced Java programmer, it is helpful to start with the [FTC Blocks tutorial](https://github.com/FIRST-Tech-Challenge/FtcRobotController/wiki/Blocks-Tutorial), and then migrate to the [OnBot Java Tool](https://github.com/FIRST-Tech-Challenge/FtcRobotController/wiki/OnBot-Java-Tutorial) or to [Android Studio](https://github.com/FIRST-Tech-Challenge/FtcRobotController/wiki/Android-Studio-Tutorial) afterwards.
-=======
 If you are new to robotics or new to the *FIRST* Tech Challenge, then you should consider reviewing the [FTC Blocks Tutorial](https://ftc-docs.firstinspires.org/programming_resources/blocks/Blocks-Tutorial.html) to get familiar with how to use the control system:
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[FTC Blocks Online Tutorial](https://ftc-docs.firstinspires.org/programming_resources/blocks/Blocks-Tutorial.html)
 
 Even if you are an advanced Java programmer, it is helpful to start with the [FTC Blocks tutorial](https://ftc-docs.firstinspires.org/programming_resources/blocks/Blocks-Tutorial.html), and then migrate to the [OnBot Java Tool](https://ftc-docs.firstinspires.org/programming_resources/onbot_java/OnBot-Java-Tutorial.html) or to [Android Studio](https://ftc-docs.firstinspires.org/programming_resources/android_studio_java/Android-Studio-Tutorial.html) afterwards.
->>>>>>> 0879b4797f7c9664731c9306926f713ef4ddfe5d
 
 ## Downloading the Project
 If you are an Android Studio programmer, there are several ways to download this repo.  Note that if you use the Blocks or OnBot Java Tool to program your robot, then you do not need to download this repository.
@@ -43,11 +31,7 @@ Once you have downloaded and uncompressed (if needed) your folder, you can use A
 ### User Documentation and Tutorials
 *FIRST* maintains online documentation with information and tutorials on how to use the *FIRST* Tech Challenge software and robot control system.  You can access this documentation using the following link:
 
-<<<<<<< HEAD
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[FtcRobotController Online Documentation](https://github.com/FIRST-Tech-Challenge/FtcRobotController/wiki)
-=======
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[FIRST Tech Challenge Documentation](https://ftc-docs.firstinspires.org/index.html)
->>>>>>> 0879b4797f7c9664731c9306926f713ef4ddfe5d
 
 Note that the online documentation is an "evergreen" document that is constantly being updated and edited.  It contains the most current information about the *FIRST* Tech Challenge software and control system.
 
@@ -57,15 +41,9 @@ The Javadoc reference documentation for the FTC SDK is now available online.  Cl
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[FTC Javadoc Documentation](https://javadoc.io/doc/org.firstinspires.ftc)
 
 ### Online User Forum
-<<<<<<< HEAD
-For technical questions regarding the Control System or the FTC SDK, please visit the FTC Technology forum:
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[FTC Technology Forum](https://ftcforum.firstinspires.org/forum/ftc-technology)
-=======
 For technical questions regarding the Control System or the FTC SDK, please visit the FIRST Tech Challenge Community site:
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[FIRST Tech Challenge Community](https://ftc-community.firstinspires.org/)
->>>>>>> 0879b4797f7c9664731c9306926f713ef4ddfe5d
 
 ### Sample OpModes
 This project contains a large selection of Sample OpModes (robot code examples) which can be cut and pasted into your /teamcode folder to be used as-is, or modified to suit your team's needs.
@@ -76,8 +54,6 @@ The readme.md file located in the [/TeamCode/src/main/java/org/firstinspires/ftc
 
 # Release Information
 
-<<<<<<< HEAD
-=======
 ## Version 8.1.1 (20221201-150726)
 
 This is a bug fix only release to address the following four issues.
@@ -153,7 +129,6 @@ This is a bug fix only release to address the following four issues.
 * Fixes NullPointerException when attempting to get a non-configured BNO055 IMU in a Blocks Op Mode on an RC phone.
 * Fixes problem with Blocks if a variable is named `orientation`.
 
->>>>>>> 0879b4797f7c9664731c9306926f713ef4ddfe5d
 ## Version 8.0 (20220907-131644)
 
 ### Breaking Changes
@@ -188,13 +163,8 @@ This is a bug fix only release to address the following four issues.
   * The exception text in the popup window is both zoomable and scrollable just like a webpage.
   * Pressing the "OK" button in the popup window will return to the main screen of the Driver Station and allow an Op Mode to be run again immediately, without the need to perform a "Restart Robot"
 * Adds new Java sample to demonstrate using a hardware class to abstract robot actuators, and share them across multiple Op Modes.
-<<<<<<< HEAD
-  * Sample Op Mode is [/FtcRobotController/src/main/java/org/firstinspires/ftc/robotcontroller/external/samples/ConceptExternalHardwareClass.java](ConceptExternalHardwareClass.java)
-  * Abstracted hardware class is [/FtcRobotController/src/main/java/org/firstinspires/ftc/robotcontroller/external/samples/RobotHardware.java](RobotHardware.java))
-=======
   * Sample Op Mode is [ConceptExternalHardwareClass.java](FtcRobotController/src/main/java/org/firstinspires/ftc/robotcontroller/external/samples/ConceptExternalHardwareClass.java)
   * Abstracted hardware class is [RobotHardware.java](FtcRobotController/src/main/java/org/firstinspires/ftc/robotcontroller/external/samples/RobotHardware.java)
->>>>>>> 0879b4797f7c9664731c9306926f713ef4ddfe5d
 * Updates RobotAutoDriveByGyro_Linear Java sample to use REV Control/Expansion hub IMU.
 * Updates Vuforia samples to reference PowerPlay assets and have correct names and field locations of image targets.
 * Updates TensorFlow samples to reference PowerPlay assets.
