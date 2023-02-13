@@ -180,20 +180,20 @@ public final class Robot {
 
     private static void setupClaw() {
         double startPosition = 1;
-        _claw = new _Servo("claw", Servo.Direction.REVERSE, 0, 1, 0.885);
+        _claw = new _Servo("claw", Servo.Direction.REVERSE, 0, 1, 0.35);
 
     }
     private static void setupClawPivot() {
         double startPosition = 0;
-        _Servo ClawPivotleft = new _Servo("pivotRight", Servo.Direction.FORWARD, 0, 1, 1);
-        _Servo ClawPivotright = new _Servo("pivotLeft", Servo.Direction.REVERSE, 0, 1, 1);
+        _Servo ClawPivotleft = new _Servo("pivotRight", Servo.Direction.FORWARD, 0, 0.7, 1);
+        _Servo ClawPivotright = new _Servo("pivotLeft", Servo.Direction.REVERSE, 0, 0.7, 1);
         _ClawPivot  = new _ServoGroup(ClawPivotleft, ClawPivotright);
         //pivot left sgould be in control hub
     }
     private static void setupArm(){
         double startPosition = 0;
-        _Servo ArmLeft = new _Servo("armLeft", Servo.Direction.REVERSE, 1, 0,0);
-        _Servo ArmRight = new _Servo("armRight", Servo.Direction.FORWARD, 1, 0, 0.03);
+        _Servo ArmLeft = new _Servo("armLeft", Servo.Direction.FORWARD, 0, 0.95,0);
+        _Servo ArmRight = new _Servo("armRight", Servo.Direction.REVERSE, 0, 0.95, 0);
         _Arm  = new _ServoGroup(ArmLeft, ArmRight);
     }
 
