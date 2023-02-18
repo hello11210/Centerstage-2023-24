@@ -38,7 +38,7 @@ public final class Robot {
     private static _Color _color;
     private static _Motor _linearslide;
     private static _Servo _claw;
-    private static _ServoGroup _ClawPivot;
+    private static _Servo _pivot;
     private static _ServoGroup _Arm;
     private static _OpenCV _webcam;
     private static _ProcessPipeline _pipeline;
@@ -184,16 +184,13 @@ public final class Robot {
 
     }
     private static void setupClawPivot() {
-        double startPosition = 0;
-        _Servo ClawPivotleft = new _Servo("pivotRight", Servo.Direction.FORWARD, 0, 0.7, 1);
-        _Servo ClawPivotright = new _Servo("pivotLeft", Servo.Direction.REVERSE, 0, 0.7, 1);
-        _ClawPivot  = new _ServoGroup(ClawPivotleft, ClawPivotright);
-        //pivot left sgould be in control hub
+//        _pivot = new _Servo("clawPivot", Servo.Direction.FORWARD, 0, 0.7, 1);
     }
+
     private static void setupArm(){
-        double startPosition = 0;
-        _Servo ArmLeft = new _Servo("armLeft", Servo.Direction.FORWARD, 0, 0.95,0);
-        _Servo ArmRight = new _Servo("armRight", Servo.Direction.REVERSE, 0, 0.95, 0);
+        double startPosition = 0.035;
+        _Servo ArmLeft = new _Servo("armLeft", Servo.Direction.FORWARD, startPosition, 0.95,0);
+        _Servo ArmRight = new _Servo("armRight", Servo.Direction.REVERSE, 0, 0.95 - startPosition, 0);
         _Arm  = new _ServoGroup(ArmLeft, ArmRight);
     }
 
@@ -211,7 +208,7 @@ public final class Robot {
         _drivetrain.update();
         _linearslide.update();
         _claw.update();
-        _ClawPivot.update();
+//        _pivot.update();
         _Arm.update();
 
         if (_isTurning) {
@@ -279,8 +276,8 @@ public final class Robot {
         return _claw;
     }
 
-    public static _ServoGroup getClawPivot() {
-        return _ClawPivot;
+    public static _Servo getClawPivot() {
+        return _pivot;
     }
     public static _ServoGroup getArm(){
         return _Arm;
