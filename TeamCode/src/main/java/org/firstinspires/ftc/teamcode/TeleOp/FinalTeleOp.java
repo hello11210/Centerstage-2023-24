@@ -143,5 +143,11 @@ public class FinalTeleOp extends _TeleOp {
         else if (gamepad1.left_trigger > 0) {
             Robot.getArm().setPosition(Robot.getArm().getPosition() - 0.001);
         }
+        else if (gamepad1.b) {
+            Robot.getArm().setPosition(0.275); // 90
+        }
+        else if (gamepad1.x) {
+            Robot.getArm().setPosition(0.95); //270; needs a little more tuning
+        }
     }
 }

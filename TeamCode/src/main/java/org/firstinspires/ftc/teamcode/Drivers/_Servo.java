@@ -139,11 +139,11 @@ public class _Servo {
 
     private void _setPosition(double position) {
         _position = _clampPosition(position);
-        _servo.setPosition(_position + _MIN);
+        _servo.setPosition(_position * (_MAX - _MIN) + _MIN);
     }
 
     private double _clampPosition(double position) {
-        return Math.max(Math.min(position, _MAX - _MIN), 0);
+        return Math.max(Math.min(position, 1), 0);
     }
 
     private void _setDegree(double degree) {
