@@ -17,10 +17,12 @@ public class RedLeft extends _Autonomous {
     private int gearCount = 0;
     private int androidCount = 0;
     private int coneNum;
+    private final double dSpeed = 0.25;
+    private double enterTime = 0;
 
     @Override
     public void init() {
-        Robot.setup(hardwareMap, telemetry, Robot.SetupType.AutonomousPart1);
+        Robot.setup(hardwareMap, telemetry, Robot.Mode.Auton, Robot.SetupType.AutonomousPart1);
 
         _validRecognition = recognition -> true;
     }
@@ -31,11 +33,15 @@ public class RedLeft extends _Autonomous {
         androidCount = Robot.getTFOD().countValidLabel(_validRecognition, "android");
         robotCount = Robot.getTFOD().countValidLabel(_validRecognition, "robot");
         gearCount = Robot.getTFOD().countValidLabel(_validRecognition, "gear");
+
+        Robot.getClaw().setPosition(Robot.UPSIDEDOWN_CLOSE);
+        Robot.getArm().setDegree(Robot.AUTONSTART_ARM);
+        Robot.getClawPivot().setDegree(Robot.AUTONSTART_PIVOT);
     }
 
     @Override
     public void start() {
-        Robot.setup(hardwareMap, telemetry, Robot.SetupType.AutonomousPart2);
+        Robot.setup(hardwareMap, telemetry, Robot.Mode.Auton, Robot.SetupType.AutonomousPart2);
 
         Robot.getTFOD().deactivate();
         Robot.getVuforia().getVuforia().close();
@@ -51,7 +57,7 @@ public class RedLeft extends _Autonomous {
             coneNum = 3;
         }
 
-        _state = State.right;
+        _state = State.off_the_wall;
         _justEntered = true;
     }
 
@@ -63,9 +69,19 @@ public class RedLeft extends _Autonomous {
         telemetry.addLine(String.valueOf(coneNum));
 
         switch (_state) {
+            case off_the_wall:
+                if (_justEntered) {
+                    Robot.getDrivetrain().runDistance(dSpeed, 2, _Drivetrain.Movements.forward);
+                    _justEntered = false;
+                }
+                else if (!Robot.getDrivetrain().isBusy()) {
+                    _justEntered = true;
+                    _state = State.right;
+                }
+                break;
             case right:
                 if (_justEntered) {
-                    Robot.getDrivetrain().runDistance(0.5, 20, _Drivetrain.Movements.forward);
+                    Robot.getDrivetrain().runDistance(dSpeed, 16, _Drivetrain.Movements.right);
                     _justEntered = false;
                 }
                 else if (!Robot.getDrivetrain().isBusy()) {
@@ -75,85 +91,124 @@ public class RedLeft extends _Autonomous {
                 break;
             case forward:
                 if (_justEntered) {
-                    if (coneNum==1){
-                        Robot.getDrivetrain().runDistance(0.5, 20, _Drivetrain.Movements.left);
+                    Robot.getDrivetrain().runDistance(dSpeed, 17, _Drivetrain.Movements.forward);
+                    Robot.getLinearslide().runDistance(1, 15.5 - (Robot.getLinearslide().getCounts() / Robot.getLinearslide().getCountsPerInch()));
+                    Robot.getArm().setSlowDegree(109, 1500);
+                    Robot.getClawPivot().setSlowDegree(0, 1500);
+                    _justEntered = false;
+                }
+                else if (!Robot.getDrivetrain().isBusy()) {
+                    _justEntered = true;
+                    _state = State.delay;
+                }
+                break;
+            case delay:
+                if (_justEntered) {
+                    enterTime = Robot.runtime.milliseconds();
+                    _justEntered = false;
+                }
+                else if (enterTime + 1500 <= Robot.runtime.milliseconds()) {
+                    _justEntered = true;
+                    _state = State.tilt;
+                }
+                break;
+            case tilt:
+                if (_justEntered) {
+                    Robot.turn(0.3, -38 - Robot.getIMU().getYaw());
+                    _justEntered = false;
+                }
+                else if (!Robot.isTurning()) {
+                    _justEntered = true;
+                    _state = State.arm_delay;
+                }
+                break;
+            case arm_delay:
+                if (_justEntered) {
+                    enterTime = Robot.runtime.milliseconds();
+                    _justEntered = false;
+                }
+                else if (enterTime + 6000 <= Robot.runtime.milliseconds()) {
+                    _justEntered = true;
+                    _state = State.deposit_delay;
+                    Robot.getClaw().setPosition(Robot.UPSIDEDOWN_OPEN);
+                }
+                break;
+            case deposit_delay:
+                if (_justEntered) {
+                    enterTime = Robot.runtime.milliseconds();
+                    _justEntered = false;
+                }
+                else if (enterTime + 2000 <= Robot.runtime.milliseconds()) {
+                    _justEntered = true;
+                    _state = State.tilt_back;
+                }
+                break;
+            case tilt_back:
+                if (_justEntered) {
+                    Robot.turn(0.3, -Robot.getIMU().getYaw());
+                    Robot.getLinearslide().runDistance(1, Robot.TELEOPCOLLECT_LS - (Robot.getLinearslide().getCounts() / Robot.getLinearslide().getCountsPerInch()));
+                    Robot.getArm().setSlowDegree(25, 500);
+                    Robot.getClawPivot().setDegree(135);
+                    _justEntered = false;
+                }
+                else if (!Robot.isTurning()) {
+                    _justEntered = true;
+                    _state = State.forward_row3;
+                    Robot.getClaw().setPosition(Robot.UPSIDEDOWN_CLOSE);
+                }
+                break;
+            case forward_row3:
+                if (_justEntered) {
+                    Robot.getDrivetrain().runDistance(dSpeed, 19, _Drivetrain.Movements.forward);
+                    _justEntered = false;
+                }
+                else if (!Robot.getDrivetrain().isBusy()) {
+                    _justEntered = true;
+                    _state = State.turn_left;
+                }
+                break;
+            case turn_left:
+                if (_justEntered) {
+                    Robot.turn(0.75, 180 - Robot.getIMU().getYaw());
+                    _justEntered = false;
+                }
+                else if (!Robot.isTurning()) {
+                    _justEntered = true;
+                    _state = State.right_cone;
+                }
+                break;
+            case right_cone:
+                if (_justEntered) {
+                    if (coneNum == 1) {
+                        Robot.getDrivetrain().runDistance(dSpeed, 36, _Drivetrain.Movements.right);
                     }
-                    else if (coneNum==3){
-                        Robot.getDrivetrain().runDistance(0.5, 20, _Drivetrain.Movements.right);
-                    }
-                    else{
-                        Robot.getDrivetrain().runDistance(0.5, 1, _Drivetrain.Movements.forward);
+                    else if (coneNum == 2) {
+                        Robot.getDrivetrain().runDistance(dSpeed, 17, _Drivetrain.Movements.right);
                     }
                     _justEntered = false;
                 }
                 else if (!Robot.getDrivetrain().isBusy()) {
                     _justEntered = true;
-                    _state = State.tilt;
+                    _state = State.stop;
                 }
                 break;
-//            case tilt:
-//                if (_justEntered) {
-//                    Robot.turn(0.25, -25);
-//                    _justEntered = false;
-//                }
-//                else if (!Robot.isTurning()) {
-//                    _justEntered = true;
-//                    _state = State.tilt_back;
-//                }
-//                break;
-//            case tilt_back:
-//                if (_justEntered) {
-//                    Robot.turn(0.25, 20);
-//                    _justEntered = false;
-//                }
-//                else if (!Robot.isTurning()) {
-//                    _justEntered = true;
-//                    _state = State.forward_row3;
-//                }
-//                break;
-//            case forward_row3:
-//                if (_justEntered) {
-//                    Robot.getDrivetrain().runDistance(0.5, 15, _Drivetrain.Movements.forward);
-//                    _justEntered = false;
-//                }
-//                else if (!Robot.getDrivetrain().isBusy()) {
-//                    _justEntered = true;
-//                    _state = State.turn_left;
-//                }
-//                break;
-//            case turn_left:
-//                if (_justEntered) {
-//                    Robot.turn(0.25, 80);
-//                    _justEntered = false;
-//                }
-//                else if (!Robot.isTurning()) {
-//                    _justEntered = true;
-//                    _state = State.forward_col1;
-//                }
-//                break;
-//            case forward_col1:
-//                if (_justEntered) {
-//                    Robot.getDrivetrain().runDistance(0.5, 30, _Drivetrain.Movements.forward);
-//                    _justEntered = false;
-//                }
-//                else if (!Robot.getDrivetrain().isBusy()) {
-//                    _justEntered = true;
-//                    _state = State.stop;
-//                }
-//                break;
-//            case stop:
-//                break;
+            case stop:
+                break;
         }
     }
 
     private enum State {
+        off_the_wall,
         right,
         forward,
+        delay,
         tilt,
+        arm_delay,
+        deposit_delay,
         tilt_back,
         forward_row3,
         turn_left,
-        forward_col1,
+        right_cone,
         stop
     }
 }

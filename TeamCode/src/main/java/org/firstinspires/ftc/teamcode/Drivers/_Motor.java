@@ -24,6 +24,11 @@ public class _Motor {
     private double _startTime;
     private double _elapsedTime;
 
+    private boolean _isProg;
+    private double _progSpeed;
+    private int _progCounts;
+    private int _progStartCounts;
+
     public _Motor(String name, Type type, DcMotorSimple.Direction direction, DcMotor.ZeroPowerBehavior zeroPowerBehavior, boolean hasEncoder) {
         _NAME = name;
         _TYPE = type;
@@ -58,6 +63,13 @@ public class _Motor {
         if (_isBusy) {
             switch (_runLimiter) {
                 case Magnitude:
+                    if (_isProg) {
+                        double progress = Math.abs((_motor.getCurrentPosition() - _progStartCounts) / _progCounts);
+                        double input = 20 * (progress - 0.85);
+                        double speed = (1 / (Math.exp(input) + 1)) * _progSpeed;
+                        _setSpeed(speed);
+                    }
+
                     if (!_motor.isBusy()) {
                         stop();
                     }
@@ -110,6 +122,35 @@ public class _Motor {
 
     public void runDistance(double distance) {
         runDistance(_typicalSpeed, distance);
+    }
+
+    public void runDistProgressive(double speed, double distance) {
+        if (!_isBusy && speed != 0 && _USAGE == Usage.Linear && _HAS_ENCODER) {
+            _isBusy = true;
+            _isProg = true;
+            _runLimiter = RunLimiter.Magnitude;
+            _zeroSpeed();
+            int sign = (speed < 0 ^ distance < 0 ? -1 : 1);
+            _progStartCounts = _motor.getCurrentPosition();
+            _progCounts = (int) (sign * Math.abs(distance) * _COUNTS_PER_INCH);
+            _motor.setTargetPosition(_progStartCounts + _progCounts);
+            _motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            _progSpeed = sign * Math.abs(speed);
+        }
+        else if (_USAGE == Usage.Circular) {
+            stop();
+            while (true) {
+                Robot.telemetry.addLine("[ERROR] _Motor.runDistProgressive USED WITH USAGE MODE CIRCULAR");
+                Robot.telemetry.update();
+            }
+        }
+        else if (!_HAS_ENCODER) {
+            stop();
+            while (true) {
+                Robot.telemetry.addLine("[ERROR] _Motor.runDistProgressive USED WITHOUT ENCODER");
+                Robot.telemetry.update();
+            }
+        }
     }
 
     public void runTime(double speed, double milliseconds) {
@@ -168,6 +209,7 @@ public class _Motor {
     }
 
     public void stop() {
+        _isProg = false;
         _isBusy = false;
         _setSpeed(0);
         _motor.setMode(_DEFAULT_RUNMODE);

@@ -111,6 +111,15 @@ public class _Drivetrain {
         runSpeedAngle(_speed, degrees, offsetDegrees);
     }
 
+    public void runDistProgressive(double speed, double distance, Movements movement) {
+        if (!_isBusy && speed != 0) {
+            _isBusy = true;
+            _movement = movement.getDirections();
+            for (int i = 0; i < _MOTOR_NUM; ++i)
+                _drivetrain[i].runDistProgressive(speed * _movement[i], distance);
+        }
+    }
+
     public void stop() {
         _isBusy = false;
         for (int i = 0; i < _MOTOR_NUM; ++i) _drivetrain[i].stop();
@@ -138,6 +147,14 @@ public class _Drivetrain {
 
     public double getSpeedBL() {
         return _drivetrain[3].getSpeed();
+    }
+
+    public int getCountsFR() {
+        return _drivetrain[0].getCounts();
+    }
+
+    public double getCountsPerInchFR() {
+        return _drivetrain[0].getCountsPerInch();
     }
 
     public boolean isBusy() {

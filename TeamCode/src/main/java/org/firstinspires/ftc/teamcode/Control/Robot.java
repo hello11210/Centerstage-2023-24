@@ -33,6 +33,18 @@ public final class Robot {
     public static HardwareMap hardwareMap;
     public static Telemetry telemetry;
 
+    public static final double UPSIDEDOWN_OPEN = 0.25;
+    public static final double UPSIDEDOWN_CLOSE = 0.52;
+    public static final double TELEOPCOLLECT_PIVOT = 60;
+    public static final double TELEOPCOLLECT_ARM = 18;
+    public static final double TELEOPCOLLECT_LS = 0;
+    public static final double TELEOPDEPOSIT_PIVOT = 0;
+    public static final double TELEOPDEPOSIT_ARM = 251;
+    public static final double TELEOPDEPOSIT_LS = 16.5;
+
+    public static final double AUTONSTART_ARM = 18;
+    public static final double AUTONSTART_PIVOT = 135;
+
     private static _Drivetrain _drivetrain;
     private static _IMU _imu;
     private static _Color _color;
@@ -45,6 +57,8 @@ public final class Robot {
     private static _Vuforia _vuforia;
     private static _TFOD _tfod;
 
+    private static Mode _mode;
+
     public static final double MM_PER_INCH = 25.4;
 
     private static final double _TURN_OFFSET_POSITIVE = 0;
@@ -53,17 +67,21 @@ public final class Robot {
     private static boolean _isTurning = false;
     private static double _startAngle;
     private static double _turnDegrees;
+    private static _Drivetrain.Movements _turnMovement;
+    private static double _turnSpeed;
     private static boolean _initialized = false;
 
     private Robot() {};
 
-    public static void setup(HardwareMap centralHardwareMap, Telemetry centralTelemetry, SetupType... setupTypes) {
+    public static void setup(HardwareMap centralHardwareMap, Telemetry centralTelemetry, Mode mode, SetupType... setupTypes) {
         if (!_initialized) {
             _initialized = true;
             runtime = new ElapsedTime();
             hardwareMap = centralHardwareMap;
             telemetry = centralTelemetry;
         }
+
+        _mode = mode;
 
         StringBuilder setupSequence = new StringBuilder();
         for (SetupType type : setupTypes) {
@@ -116,6 +134,10 @@ public final class Robot {
         }
 
         telemetry.addLine(setupSequence.toString());
+    }
+
+    public static void setup(HardwareMap centralHardwareMap, Telemetry centralTelemetry, SetupType... setupTypes) {
+        setup(centralHardwareMap, centralTelemetry, Mode.Auton, setupTypes);
     }
 
     private static void setupAutonomousPart1() {
@@ -173,24 +195,44 @@ public final class Robot {
     }
 
     private static void setupLinearslide() {
-        double linearslideDiameter = 1.25/2; //inches
-        _linearslide = new _Motor("linearslide", _Motor.Type.GOBILDA_435_RPM, DcMotorSimple.Direction.FORWARD,
+        double linearslideDiameter = 1.25; //inches
+        _linearslide = new _Motor("linearslide", _Motor.Type.GOBILDA_117_RPM, DcMotorSimple.Direction.REVERSE,
                 DcMotor.ZeroPowerBehavior.BRAKE, linearslideDiameter, true); //Add encoder if theres isn't already
     }
 
     private static void setupClaw() {
-        double startPosition = 1;
-        _claw = new _Servo("claw", Servo.Direction.REVERSE, 0, 1, 0.35);
-
+        double startPosition = 0;
+        if (_mode == Mode.Auton) {
+            startPosition = UPSIDEDOWN_CLOSE;
+        }
+        else {
+            startPosition = UPSIDEDOWN_OPEN;
+        }
+        _claw = new _Servo("claw", Servo.Direction.FORWARD, 0, 1, startPosition);
     }
+
     private static void setupClawPivot() {
-//        _pivot = new _Servo("clawPivot", Servo.Direction.FORWARD, 0, 0.7, 1);
+        double startDegree = 0;
+        if (_mode == Mode.Auton) {
+            startDegree = AUTONSTART_PIVOT;
+        }
+        else {
+            startDegree = TELEOPCOLLECT_PIVOT;
+        }
+        _pivot = new _Servo("clawPivot", Servo.Direction.FORWARD, 0.013, 0.663, startDegree, 0, 0, 1, 180);
     }
 
     private static void setupArm(){
-        double startPosition = 0.027;
-        _Servo ArmLeft = new _Servo("armLeft", Servo.Direction.FORWARD, startPosition, 0.95,0);
-        _Servo ArmRight = new _Servo("armRight", Servo.Direction.REVERSE, 0, 0.95 - startPosition, 0);
+        double startDegree = 0;
+        if (_mode == Mode.Auton) {
+            startDegree = AUTONSTART_ARM;
+        }
+        else {
+            startDegree = TELEOPCOLLECT_ARM;
+        }
+        double offset = 0.027;
+        _Servo ArmLeft = new _Servo("armLeft", Servo.Direction.FORWARD, offset, 0.95, startDegree, 0.275, 90, 0.96, 270);
+        _Servo ArmRight = new _Servo("armRight", Servo.Direction.REVERSE, 0, 0.95 - offset, startDegree, 0.275, 90, 0.96, 270);
         _Arm  = new _ServoGroup(ArmLeft, ArmRight);
     }
 
@@ -208,19 +250,21 @@ public final class Robot {
         _drivetrain.update();
         _linearslide.update();
         _claw.update();
-//        _pivot.update();
+        _pivot.update();
         _Arm.update();
 
         if (_isTurning) {
-            if (Math.abs(_turnDegrees) > Math.max(_TURN_OFFSET_POSITIVE, _TURN_OFFSET_NEGATIVE)) {
-                if (_turnDegrees > 0 ? _imu.getYaw() - _startAngle >= _turnDegrees - _TURN_OFFSET_POSITIVE : _imu.getYaw() - _startAngle <= _turnDegrees + _TURN_OFFSET_NEGATIVE) {
-                    _isTurning = false;
-                }
+            if ((Math.abs(_turnDegrees) > Math.max(_TURN_OFFSET_POSITIVE, _TURN_OFFSET_NEGATIVE)) && (_turnDegrees > 0 ? _imu.getYaw() - _startAngle >= _turnDegrees - _TURN_OFFSET_POSITIVE : _imu.getYaw() - _startAngle <= _turnDegrees + _TURN_OFFSET_NEGATIVE)) {
+                _isTurning = false;
+            }
+            else if (_turnDegrees > 0 ? _imu.getYaw() - _startAngle >= _turnDegrees : _imu.getYaw() - _startAngle <= _turnDegrees) {
+                _isTurning = false;
             }
             else {
-                if (_turnDegrees > 0 ? _imu.getYaw() - _startAngle >= _turnDegrees : _imu.getYaw() - _startAngle <= _turnDegrees) {
-                    _isTurning = false;
-                }
+                double progress = Math.abs((_imu.getYaw() - _startAngle) / _turnDegrees);
+                double input = 8 * (progress - 0.5);
+                double speed = (1 / (Math.exp(input) + 1)) * _turnSpeed;
+                _drivetrain.runSpeed(speed, _turnMovement);
             }
 
             if (!_isTurning) {
@@ -234,21 +278,22 @@ public final class Robot {
             _isTurning = true;
             _startAngle = _imu.getYaw();
             _turnDegrees = degrees;
+            _turnSpeed = speed;
 
-            _Drivetrain.Movements movement = _Drivetrain.Movements.forward; // arbitrary initialization
+            _turnMovement = _Drivetrain.Movements.forward; // arbitrary initialization
             switch (turnAxis) {
                 case Center:
-                    movement = _turnDegrees > 0 ? _Drivetrain.Movements.ccw : _Drivetrain.Movements.cw;
+                    _turnMovement = _turnDegrees > 0 ? _Drivetrain.Movements.ccw : _Drivetrain.Movements.cw;
                     break;
                 case Back:
-                    movement = _turnDegrees > 0 ? _Drivetrain.Movements.ccwback : _Drivetrain.Movements.cwback;
+                    _turnMovement = _turnDegrees > 0 ? _Drivetrain.Movements.ccwback : _Drivetrain.Movements.cwback;
                     break;
                 case Front:
-                    movement = _turnDegrees > 0 ? _Drivetrain.Movements.ccwfront : _Drivetrain.Movements.cwfront;
+                    _turnMovement = _turnDegrees > 0 ? _Drivetrain.Movements.ccwfront : _Drivetrain.Movements.cwfront;
                     break;
             }
 
-            _drivetrain.runSpeed(speed, movement);
+//            _drivetrain.runSpeed(speed, movement);
         }
     }
 
@@ -324,6 +369,11 @@ public final class Robot {
         Front,
         Center,
         Back
+    }
+
+    public enum Mode {
+        Auton,
+        TeleOp
     }
 
     public static class _ProcessPipeline extends OpenCvPipeline
