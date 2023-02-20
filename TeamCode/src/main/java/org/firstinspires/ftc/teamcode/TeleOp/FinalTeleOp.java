@@ -16,7 +16,7 @@ public class FinalTeleOp extends _TeleOp {
 
     @Override
     public void init_loop() {
-        Robot.getClaw().setPosition(Robot.UPSIDEDOWN_OPEN);
+        Robot.getClaw().setPosition(Robot.TELEOP_OPEN);
         Robot.getArm().setDegree(Robot.TELEOPCOLLECT_ARM);
         Robot.getClawPivot().setDegree(Robot.TELEOPCOLLECT_PIVOT);
     }
@@ -38,7 +38,7 @@ public class FinalTeleOp extends _TeleOp {
             double left_stick_y = -gamepad1.left_stick_y;
             double left_stick_x = gamepad1.left_stick_x;
             double joyStickAngle = (Math.toDegrees(Math.atan2(left_stick_y, left_stick_x)) + 360) % 360;
-            double speed = Math.hypot(left_stick_x, left_stick_y)/1.5;//to make faster make lower
+            double speed = Math.hypot(left_stick_x, left_stick_y) * 0.50;
             Robot.getDrivetrain().runSpeedAngle(speed, joyStickAngle,180);
         }
         else if(gamepad1.right_stick_x!=0 || gamepad1.right_stick_y!=0){
@@ -64,12 +64,13 @@ public class FinalTeleOp extends _TeleOp {
                 Robot.getDrivetrain().stop();
         }
 
-        if (gamepad1.dpad_left) {
-            Robot.getDrivetrain().runDistance(0.1, 3, _Drivetrain.Movements.forward);
+//        if (gamepad1.dpad_left) {
+//            Robot.getDrivetrain().runDistance(0.1, 6, _Drivetrain.Movements.forward);
+//        }
+        if (gamepad1.dpad_right) {
+            Robot.getClaw().setPosition(Robot.TELEOP_OPEN);
         }
-
-        if (gamepad1.dpad_down) {
-            Robot.getClaw().setPosition(Robot.UPSIDEDOWN_OPEN);
+        else if (gamepad1.dpad_down) {
             Robot.getArm().setSlowDegree(Robot.TELEOPCOLLECT_ARM, 500);
             Robot.getClawPivot().setSlowDegree(Robot.TELEOPCOLLECT_PIVOT, 500);
             Robot.getLinearslide().runDistance(1, Robot.TELEOPCOLLECT_LS - (Robot.getLinearslide().getCounts() / Robot.getLinearslide().getCountsPerInch()));
@@ -79,7 +80,46 @@ public class FinalTeleOp extends _TeleOp {
             Robot.getArm().setSlowDegree(Robot.TELEOPDEPOSIT_ARM, 2000);
             Robot.getClawPivot().setSlowDegree(Robot.TELEOPDEPOSIT_PIVOT, 2000);
             Robot.getLinearslide().runDistance(1, Robot.TELEOPDEPOSIT_LS - (Robot.getLinearslide().getCounts() / Robot.getLinearslide().getCountsPerInch()));
-            Robot.getDrivetrain().runDistance(0.1, 3, _Drivetrain.Movements.backward);
+//            Robot.getDrivetrain().runDistance(0.1, 6, _Drivetrain.Movements.backward);
+        }
+
+        if (!Robot.getLinearslide().isBusy()) {
+            if (gamepad2.dpad_up && (Robot.getLinearslide().getCounts() / Robot.getLinearslide().getCountsPerInch()) < 18) {
+                Robot.getLinearslide().runSpeed(1);
+            }
+            else if (gamepad2.dpad_down && (Robot.getLinearslide().getCounts() / Robot.getLinearslide().getCountsPerInch()) > 0.1) {
+                Robot.getLinearslide().runSpeed(-1);
+            }
+            else {
+                Robot.getLinearslide().stop();
+            }
+        }
+
+        if (!Robot.getClawPivot().isBusy()) {
+            if (gamepad2.right_bumper) {
+                Robot.getClawPivot().setPosition(Robot.getClawPivot().getPosition() + 0.002);
+            }
+            else if (gamepad2.left_bumper) {
+                Robot.getClawPivot().setPosition(Robot.getClawPivot().getPosition() - 0.002);
+            }
+        }
+
+        if (!Robot.getArm().isBusy()) {
+            if (gamepad2.right_trigger > 0) {
+                Robot.getArm().setPosition(Robot.getArm().getPosition() + 0.001);
+            }
+            else if (gamepad2.left_trigger > 0) {
+                Robot.getArm().setPosition(Robot.getArm().getPosition() - 0.001);
+            }
+        }
+
+        if (!Robot.getClaw().isBusy()) {
+            if (gamepad2.a) {
+                Robot.getClaw().setPosition(Robot.TELEOP_OPEN);
+            }
+            else if (gamepad2.b) {
+                Robot.getClaw().setPosition(Robot.UPSIDEDOWN_CLOSE);
+            }
         }
     }
 }

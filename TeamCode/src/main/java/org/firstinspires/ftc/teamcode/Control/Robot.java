@@ -35,12 +35,13 @@ public final class Robot {
 
     public static final double UPSIDEDOWN_OPEN = 0.25;
     public static final double UPSIDEDOWN_CLOSE = 0.52;
-    public static final double TELEOPCOLLECT_PIVOT = 60;
+    public static final double TELEOP_OPEN = 0.15;
+    public static final double TELEOPCOLLECT_PIVOT = 50;
     public static final double TELEOPCOLLECT_ARM = 18;
     public static final double TELEOPCOLLECT_LS = 0;
     public static final double TELEOPDEPOSIT_PIVOT = 0;
-    public static final double TELEOPDEPOSIT_ARM = 251;
-    public static final double TELEOPDEPOSIT_LS = 16.5;
+    public static final double TELEOPDEPOSIT_ARM = 109; //251
+    public static final double TELEOPDEPOSIT_LS = 17.5;
 
     public static final double AUTONSTART_ARM = 18;
     public static final double AUTONSTART_PIVOT = 135;

@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.Drivers._Drivetrain;
 import org.firstinspires.ftc.teamcode.Drivers._TFOD;
 
 @Autonomous(group="Auton", preselectTeleOp = "FinalTeleOp")
-public class BlueRight extends _Autonomous {
+public class RedLeftField2 extends _Autonomous {
 
     private State _state;
     private boolean _justEntered;
@@ -76,12 +76,12 @@ public class BlueRight extends _Autonomous {
                 }
                 else if (!Robot.getDrivetrain().isBusy()) {
                     _justEntered = true;
-                    _state = State.left;
+                    _state = State.right;
                 }
                 break;
-            case left:
+            case right:
                 if (_justEntered) {
-                    Robot.getDrivetrain().runDistance(dSpeed, 15.5, _Drivetrain.Movements.left);
+                    Robot.getDrivetrain().runDistance(dSpeed, 13, _Drivetrain.Movements.right);
                     _justEntered = false;
                 }
                 else if (!Robot.getDrivetrain().isBusy()) {
@@ -91,7 +91,7 @@ public class BlueRight extends _Autonomous {
                 break;
             case forward:
                 if (_justEntered) {
-                    Robot.getDrivetrain().runDistance(dSpeed, 15.5, _Drivetrain.Movements.forward);
+                    Robot.getDrivetrain().runDistance(dSpeed, 14, _Drivetrain.Movements.forward);
                     Robot.getLinearslide().runDistance(1, 15.5 - (Robot.getLinearslide().getCounts() / Robot.getLinearslide().getCountsPerInch()));
                     Robot.getArm().setSlowDegree(109, 1500);
                     Robot.getClawPivot().setSlowDegree(0, 1500);
@@ -114,7 +114,7 @@ public class BlueRight extends _Autonomous {
                 break;
             case tilt:
                 if (_justEntered) {
-                    Robot.turn(0.3, 36 - Robot.getIMU().getYaw());
+                    Robot.turn(0.3, -38 - Robot.getIMU().getYaw());
                     _justEntered = false;
                 }
                 else if (!Robot.isTurning()) {
@@ -164,26 +164,26 @@ public class BlueRight extends _Autonomous {
                 }
                 else if (!Robot.getDrivetrain().isBusy()) {
                     _justEntered = true;
-                    _state = State.turn_right;
+                    _state = State.turn_left;
                 }
                 break;
-            case turn_right:
+            case turn_left:
                 if (_justEntered) {
-                    Robot.turn(0.75, -175 - Robot.getIMU().getYaw());
+                    Robot.turn(0.75, 180 - Robot.getIMU().getYaw());
                     _justEntered = false;
                 }
                 else if (!Robot.isTurning()) {
                     _justEntered = true;
-                    _state = State.left_cone;
+                    _state = State.right_cone;
                 }
                 break;
-            case left_cone:
+            case right_cone:
                 if (_justEntered) {
-                    if (coneNum == 3) {
-                        Robot.getDrivetrain().runDistance(dSpeed, 36, _Drivetrain.Movements.left);
+                    if (coneNum == 1) {
+                        Robot.getDrivetrain().runDistance(dSpeed, 36, _Drivetrain.Movements.right);
                     }
                     else if (coneNum == 2) {
-                        Robot.getDrivetrain().runDistance(dSpeed, 18, _Drivetrain.Movements.left);
+                        Robot.getDrivetrain().runDistance(dSpeed, 17, _Drivetrain.Movements.right);
                     }
                     _justEntered = false;
                 }
@@ -199,7 +199,7 @@ public class BlueRight extends _Autonomous {
 
     private enum State {
         off_the_wall,
-        left,
+        right,
         forward,
         delay,
         tilt,
@@ -207,8 +207,8 @@ public class BlueRight extends _Autonomous {
         deposit_delay,
         tilt_back,
         forward_row3,
-        turn_right,
-        left_cone,
+        turn_left,
+        right_cone,
         stop
     }
 }
